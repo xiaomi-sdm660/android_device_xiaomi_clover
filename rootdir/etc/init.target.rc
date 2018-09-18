@@ -90,6 +90,9 @@ on post-fs-data
     chmod 0644 /sys/class/power_supply/battery/constant_charge_current_max
     restorecon_recursive /persist
 
+    mkdir /data/thermal 0771 system system
+    mkdir /data/thermal/config 0771 system system
+
 on boot
     start rmt_storage
     start rfs_access
