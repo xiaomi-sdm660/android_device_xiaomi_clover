@@ -31,7 +31,11 @@ DEVICE_PACKAGE_OVERLAYS += \
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/tablet_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/tablet_core_hardware.xml 
+    frameworks/native/data/etc/tablet_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/tablet_core_hardware.xml
+    
+# Permissions
+PRODUCT_COPY_FILES += \    
+    frameworks/native/data/etc/android.hardware.camera.autofocus.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.autofocus.xml 
 
 # Audio
 PRODUCT_COPY_FILES += \
@@ -70,7 +74,16 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/media/media_profiles.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_vendor.xml \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
-    
+
+# Prebuilt kernel
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilt/Image.gz-dtb:kernel
+
+# Prebuilt modules
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilt/exfat.ko:system/lib/modules/exfat.ko \
+    $(DEVICE_PATH)/prebuilt/qca_cld3/qca_cld3_wlan.ko:$(TARGET_COPY_OUT_VENDOR)/lib/modules/qca_cld3/qca_cld3_wlan.ko 
+ 
 # Ramdisk
 PRODUCT_PACKAGES += \
     init.class_main.sh \
