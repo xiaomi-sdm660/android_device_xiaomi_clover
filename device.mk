@@ -70,6 +70,19 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/media/media_profiles.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_vendor.xml \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
+    
+# Ramdisk
+PRODUCT_PACKAGES += \
+    init.class_main.sh \
+    init.msm.usb.configfs.rc \
+    init.qcom.early_boot.sh \
+    init.qcom.post_boot.sh \
+    init.qcom.rc \
+    init.qcom.sh \
+    init.qcom.usb.rc \
+    init.qcom.usb.sh \
+    init.target.rc \
+    ueventd.qcom.rc
 
 # Device is a Tablet
 PRODUCT_AAPT_CONFIG := normal large
