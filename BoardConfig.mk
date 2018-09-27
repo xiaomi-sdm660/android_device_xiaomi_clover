@@ -21,6 +21,10 @@ DEVICE_PATH := device/xiaomi/clover
 # Platform
 BOARD_VENDOR_PLATFORM := xiaomi-sdm660
 
+# Props
+TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
+TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
+
 # Kernel
 TARGET_KERNEL_SOURCE := kernel/xiaomi/clover
 TARGET_KERNEL_CONFIG := clover-perf_defconfig
