@@ -120,6 +120,9 @@ PRODUCT_AAPT_PREF_CONFIG := xhdpi
 TARGET_SCREEN_HEIGHT := 1920
 TARGET_SCREEN_WIDTH := 1200
 
+# Include Vendor files
+$(call inherit-product, vendor/xiaomi/sdm660/clover/clover-vendor.mk)
+
 # Set those variables here to overwrite the inherited values.
 PRODUCT_NAME := aosp_clover
 PRODUCT_DEVICE := clover
