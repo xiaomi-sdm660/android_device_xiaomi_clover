@@ -21,10 +21,6 @@
 # definition file).
 #
 
-LOCAL_PATH := $(call my-dir)
-
-ifeq ($(TARGET_DEVICE),clover)
-include $(call all-makefiles-under,$(LOCAL_PATH))
-
-include $(CLEAR_VARS)
-endif
+# inherit MI PAD 4 CarbonRom device config
+PRODUCT_MAKEFILES := \
+    $(LOCAL_DIR)/carbon_clover.mk

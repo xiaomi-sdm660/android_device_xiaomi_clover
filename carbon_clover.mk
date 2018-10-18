@@ -21,10 +21,32 @@
 # definition file).
 #
 
-LOCAL_PATH := $(call my-dir)
+# Inherit device configuration
+$(call inherit-product, device/xiaomi/clover/device.mk)
 
-ifeq ($(TARGET_DEVICE),clover)
-include $(call all-makefiles-under,$(LOCAL_PATH))
+# Inherit Carbon GSM telephony parts
+$(call inherit-product, vendor/carbon/config/gsm.mk)
 
-include $(CLEAR_VARS)
-endif
+# Inherit Carbon product configuration
+$(call inherit-product, vendor/carbon/config/common.mk)
+
+# CarbonRom Maintainer
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.carbon.maintainer="Rcstar6696"
+
+# Device tree path    
+DEVICE_PATH := device/xiaomi/clover
+
+PRODUCT_BUILD_PROP_OVERRIDES += \
+	PRIVATE_BUILD_DESC="clover-user 8.1.0 OPM1.171019.019 8.8.23 release-keys"
+
+BUILD_FINGERPRINT="Xiaomi/clover/clover:8.1.0/OPM1.171019.019/8.8.23:user/release-keys"
+
+# Device identifier
+PRODUCT_BRAND := Android
+PRODUCT_MANUFACTURER := Xiaomi
+PRODUCT_PLATFORM := SDM660
+PRODUCT_NAME := carbon_clover
+PRODUCT_CHARACTERISTICS := tablet
+PRODUCT_DEVICE := clover
+PRODUCT_MODEL := MI PAD 4 (CarbonROM)

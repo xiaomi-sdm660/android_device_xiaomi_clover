@@ -1,4 +1,4 @@
-Copyright 2018 The Android Open Source Project
+Copyright (C) 2018 CarbonROM
 
 The MI PAD 4 (codenamed _"clover"_) are high-end mid-range tablet from Xiaomi.
 
