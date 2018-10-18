@@ -1,6 +1,7 @@
 #! /vendor/bin/sh
 
-# Copyright (c) 2012-2013,2016 The Linux Foundation. All rights reserved.
+# Copyright (c) 2012-2013,2016,2018 The Linux Foundation.
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -225,7 +226,7 @@ case "$target" in
         # 196609 is decimal for 0x30001 to report version 3.1
         # 196610 is decimal for 0x30002 to report version 3.2
         case "$soc_hwid" in
-            294|295|296|297|298|313)
+            294|295|296|297|298|313|353|354|363|364)
                 setprop ro.opengles.version 196610
                 ;;
             303|307|308|309|320)

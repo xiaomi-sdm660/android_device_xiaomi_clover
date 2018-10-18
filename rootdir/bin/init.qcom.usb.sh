@@ -110,12 +110,11 @@ fi
 # Allow USB enumeration with default PID/VID
 #
 baseband=`getprop ro.baseband`
-debuggable=`getprop ro.debuggable`
 
 echo 1  > /sys/class/android_usb/f_mass_storage/lun/nofua
 usb_config=`getprop persist.sys.usb.config`
 case "$usb_config" in
-    "" | "adb" | "none") #USB persist config not set, select default configuration
+    "" | "adb") #USB persist config not set, select default configuration
       case "$esoc_link" in
           "PCIe")
               setprop persist.sys.usb.config diag,diag_mdm,serial_cdev,rmnet_qti_ether,mass_storage,adb
@@ -134,12 +133,7 @@ case "$usb_config" in
 		  soc_machine=${soc_machine:0:3}
 		  case "$soc_machine" in
 		    "SDA")
-	              # setprop persist.sys.usb.config diag,adb
-                      if [ -z "$debuggable" -o "$debuggable" = "1" ]; then
-                          setprop persist.sys.usb.config adb
-                      else
-                          setprop persist.sys.usb.config none
-                      fi
+	              setprop persist.sys.usb.config diag,adb
 		    ;;
 		    *)
 	            case "$target" in
@@ -180,12 +174,7 @@ case "$usb_config" in
 			      fi
 		      ;;
 	              "msm8998" | "sdm660" | "apq8098_latv")
-		          # setprop persist.sys.usb.config diag,serial_cdev,rmnet,adb
-                          if [ -z "$debuggable" -o "$debuggable" = "1" ]; then
-                              setprop persist.sys.usb.config adb
-                          else
-                              setprop persist.sys.usb.config none
-                          fi
+		          setprop persist.sys.usb.config diag,serial_cdev,rmnet,adb
 		      ;;
 	              "sdm845")
 		          setprop persist.sys.usb.config diag,serial_cdev,rmnet,dpl,adb
@@ -273,14 +262,6 @@ if [ -d /config/usb_gadget ]; then
 
 	setprop sys.usb.configfs 1
 else
-	persist_comp=`getprop persist.sys.usb.config`
-	comp=`getprop sys.usb.config`
-	echo $persist_comp
-	echo $comp
-	if [ "$comp" != "$persist_comp" ]; then
-		echo "setting sys.usb.config"
-		setprop sys.usb.config $persist_comp
-	fi
         #
         # Do target specific things
         #
@@ -314,6 +295,14 @@ else
                 esac
              ;;
         esac
+	persist_comp=`getprop persist.sys.usb.config`
+	comp=`getprop sys.usb.config`
+	echo $persist_comp
+	echo $comp
+	if [ "$comp" != "$persist_comp" ]; then
+		echo "setting sys.usb.config"
+		setprop sys.usb.config $persist_comp
+	fi
 fi
 
 #

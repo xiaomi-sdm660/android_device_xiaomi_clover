@@ -36,11 +36,9 @@ datamode=`getprop persist.data.mode`
 
 case "$baseband" in
     "apq" | "sda" )
-#modify by gongpeicai for wifiOnly bug-start
-#    setprop ro.radio.noril yes
     setprop ro.radio.noril true
-#modify by gongpeicai for wifiOnly bug-end
     stop ril-daemon
+    start ipacm
 esac
 
 case "$baseband" in
@@ -50,7 +48,6 @@ esac
 
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "mdm" | "mdm2" | "sglte" | "sglte2" | "dsda2" | "unknown" | "dsda3" | "sdm" | "sdx")
-    start ipacm-diag
     start ipacm
     case "$baseband" in
         "svlte2a" | "csfb")
