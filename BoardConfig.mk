@@ -25,6 +25,9 @@ BOARD_VENDOR_PLATFORM := xiaomi-sdm660
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 
+# Manifest 
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+
 # Custom Bootimg for prebuilt kernel
 BOARD_CUSTOM_BOOTIMG := true
 BOARD_CUSTOM_BOOTIMG_MK := $(DEVICE_PATH)/mkbootimg.mk
