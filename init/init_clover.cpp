@@ -88,18 +88,13 @@ static void init_alarm_boot_properties()
 
 void vendor_load_properties()
 {
-    std::string platform;
     std::string hw_device;
-
-    platform = GetProperty("ro.board.platform", "");
-    if (platform != ANDROID_TARGET)
-        return;
 
     hw_device = GetProperty("ro.board.variant", "");
     if (hw_device.compare("d9")) {
-        property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4");
+         property_set ( "ro.vendor.product.model", "MI PAD 4");
     } else if (hw_device.compare("d9p")) {
-        property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4 PLUS");
+        property_set ( "ro.vendor.product.model", "MI PAD 4 PLUS");
     }
 
     init_alarm_boot_properties();
