@@ -213,8 +213,9 @@ persist.dirac.acs.storeSettings=1
 ro.audio.soundfx.dirac=true
 
 #Disable NRSM function
-persist.dpm.feature=1
+persist.vendor.dpm.feature=1
 
+#LCD
 ro.sf.lcd_density=265
 
 #enable fastdormancy
