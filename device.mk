@@ -95,7 +95,7 @@ PRODUCT_COPY_FILES += \
 # Prebuilt modules
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/prebuilt/exfat.ko:system/lib/modules/exfat.ko \
-    $(DEVICE_PATH)/prebuilt/qca_cld3/qca_cld3_wlan.ko:$(TARGET_COPY_OUT_VENDOR)/lib/modules/qca_cld3/qca_cld3_wlan.ko 
+    $(DEVICE_PATH)/prebuilt/qca_cld3_wlan.ko:system/lib/modules/qca_cld3_wlan.ko 
  
 # Ramdisk
 PRODUCT_PACKAGES += \
