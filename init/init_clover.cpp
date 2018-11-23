@@ -88,13 +88,23 @@ static void init_alarm_boot_properties()
 
 void vendor_load_properties()
 {
+    std::string platform;
     std::string hw_device;
+
+    char const *hw_id_file = "/sys/devices/platform/HardwareInfo/hw_id";
 
     hw_device = GetProperty("ro.board.variant", "");
     if (hw_device.compare("d9")) {
          property_set ( "ro.vendor.product.model", "MI PAD 4");
     } else if (hw_device.compare("d9p")) {
         property_set ( "ro.vendor.product.model", "MI PAD 4 PLUS");
+    }
+
+    ReadFileToString(hw_id_file, &hw_device);
+    if (hw_device.find("D9P") != std::string::npos) {
+        property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4 PLUS");
+    } else {
+        property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4");
     }
 
     init_alarm_boot_properties();
