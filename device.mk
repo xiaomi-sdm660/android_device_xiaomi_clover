@@ -88,15 +88,6 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml \
     $(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
 
-# Prebuilt kernel
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/prebuilt/Image.gz-dtb:kernel
-
-# Prebuilt modules
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/prebuilt/exfat.ko:system/lib/modules/exfat.ko \
-    $(DEVICE_PATH)/prebuilt/qca_cld3_wlan.ko:system/lib/modules/qca_cld3_wlan.ko 
- 
 # Ramdisk
 PRODUCT_PACKAGES += \
     init.class_main.sh \
