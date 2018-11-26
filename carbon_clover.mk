@@ -38,10 +38,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 DEVICE_PATH := device/xiaomi/clover
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
-	PRIVATE_BUILD_DESC="clover-user 8.1.0 OPM1.171019.019 8.8.23 release-keys"
+	PRIVATE_BUILD_DESC="clover-user 8.1.0 OPM1.171019.019 V10.1.1.0.ODJCNFI release-keys"
 
-BUILD_FINGERPRINT="Xiaomi/clover/clover:8.1.0/OPM1.171019.019/8.8.23:user/release-keys"
-
+BUILD_FINGERPRINT="Xiaomi/clover/clover:8.1.0/OPM1.171019.019/V10.1.1.0.ODJCNFI:user/release-keys"
+     
 # Device identifier
 PRODUCT_BRAND := Android
 PRODUCT_MANUFACTURER := Xiaomi
