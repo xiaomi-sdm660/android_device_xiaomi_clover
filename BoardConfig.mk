@@ -39,6 +39,9 @@ TARGET_RECOVERY_DEVICE_MODULES := libinit_clover
 # Manifest 
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 
+# Security patch level
+VENDOR_SECURITY_PATCH := 2018-10-01
+
 # Custom Bootimg for prebuilt kernel
 BOARD_CUSTOM_BOOTIMG := true
 BOARD_CUSTOM_BOOTIMG_MK := $(DEVICE_PATH)/mkbootimg.mk
