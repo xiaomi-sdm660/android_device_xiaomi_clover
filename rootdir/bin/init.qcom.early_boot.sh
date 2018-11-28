@@ -518,17 +518,3 @@ if [ -f /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies ]; then
     gpu_freq=`cat /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies` 2> /dev/null
     setprop ro.gpu.available_frequencies "$gpu_freq"
 fi
-
-# set prop for fingerprint identification
-hw_id=`cat /sys/devices/platform/HardwareInfo/hw_id`
-hw_device=`echo $hw_id | sed -ne 's/^\([^_]*\)_\([^_]*\)_\([^_]*\).*/\3/p'`
-case "$hw_device" in
-    "D9" | "NULL" )
-        setprop persist.sys.fp.vendor none
-        setprop ro.board.variant d9
-        ;;
-    "D9P" )
-        setprop persist.sys.fp.vendor fpc
-        setprop ro.board.variant d9p
-        ;;
-esac
