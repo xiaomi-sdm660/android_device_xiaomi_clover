@@ -25,17 +25,14 @@
 # Inherit the fusion-common definitions
 $(call inherit-product, device/xiaomi/sdm660-common/platform.mk)
 
-# setup dalvik vm configs
-#$(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
-
-# setup HWUI configs
-#$(call inherit-product, frameworks/native/build/phone-xxhdpi-3072-hwui-memory.mk)
-
 DEVICE_PATH := device/xiaomi/clover
 
 #  Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(DEVICE_PATH)/overlay
+    
+# Device properties
+include $(DEVICE_PATH)/device_prop.mk
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
