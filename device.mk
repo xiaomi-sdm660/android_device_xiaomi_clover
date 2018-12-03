@@ -32,7 +32,7 @@ DEVICE_PACKAGE_OVERLAYS += \
     $(DEVICE_PATH)/overlay
     
 # Device properties
-include $(DEVICE_PATH)/device_prop.mk
+$(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
