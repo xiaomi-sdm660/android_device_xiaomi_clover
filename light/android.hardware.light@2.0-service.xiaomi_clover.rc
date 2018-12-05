@@ -16,10 +16,7 @@ on boot
     chmod 660 /sys/class/leds/red/ramp_step_ms
     chmod 660 /sys/class/leds/red/start_idx
 
-    # Button backlight
-    chown system system /sys/class/leds/button-backlight1/brightness
-
-service light-hal-2-0 /vendor/bin/hw/android.hardware.light@2.0-service.xiaomi_clover
+service vendor.light-hal-2-0 /vendor/bin/hw/android.hardware.light@2.0-service.xiaomi_clover
     class hal
     user system
     group system
