@@ -83,7 +83,7 @@ PRODUCT_COPY_FILES += \
 
 # Ramdisk
 PRODUCT_PACKAGES += \
-    init.clover.rc \
+    init.device.rc \
     init.macaddress_setup.sh
 
 # Screen density
