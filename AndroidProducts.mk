@@ -23,4 +23,4 @@
 
 # inherit MI PAD 4 CarbonRom device config
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/carbon_clover.mk
+    $(LOCAL_DIR)/havoc_clover.mk

@@ -22,6 +22,6 @@
 #
 
 
-add_lunch_combo aosp_clover-eng
-add_lunch_combo aosp_clover-userdebug
-add_lunch_combo aosp_clover-user
+add_lunch_combo havoc_clover-eng
+add_lunch_combo havoc_clover-userdebug
+add_lunch_combo havoc_clover-user
