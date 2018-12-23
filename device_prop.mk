@@ -64,7 +64,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Media
 PRODUCT_PROPERTY_OVERRIDES += \
-	mm.enable.qcom_parser=13631487
+	vendor.mm.enable.qcom_parser=13631487
 
 # System property for color temperature
 PRODUCT_PROPERTY_OVERRIDES += \
