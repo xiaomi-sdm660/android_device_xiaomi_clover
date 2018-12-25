@@ -23,24 +23,25 @@
 
 include device/xiaomi/sdm660-common/PlatformConfig.mk
 
+# Device Path
 DEVICE_PATH := device/xiaomi/clover
-
-# Platform
-BOARD_VENDOR_PLATFORM := xiaomi-sdm660
 
 # DT2W
 TARGET_TAP_TO_WAKE_NODE := "/sys/devices/soc/c177000.i2c/i2c-3/3-0038/fts_gesture_mode"
+
+# Kernel
+TARGET_KERNEL_SOURCE := kernel/xiaomi/clover
+TARGET_KERNEL_CONFIG := clover-perf_defconfig
+
+# Manifest
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+
+# Platform
+BOARD_VENDOR_PLATFORM := xiaomi-sdm660
 
 # Vendor init
 TARGET_INIT_VENDOR_LIB := libinit_clover
 TARGET_RECOVERY_DEVICE_MODULES := libinit_clover
 
-# Manifest
-DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
-
-# Security patch level
+# Vendor Security patch level
 VENDOR_SECURITY_PATCH := 2018-10-01
-
-# Kernel
-TARGET_KERNEL_SOURCE := kernel/xiaomi/clover
-TARGET_KERNEL_CONFIG := clover-perf_defconfig

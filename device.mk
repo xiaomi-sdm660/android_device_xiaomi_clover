@@ -22,25 +22,15 @@
 #
 
 
-# Inherit the fusion-common definitions
+# Inherit the sdm660-common definitions
 $(call inherit-product, device/xiaomi/sdm660-common/platform.mk)
 
+# Device Path
 DEVICE_PATH := device/xiaomi/clover
 
 #  Overlays
 DEVICE_PACKAGE_OVERLAYS += \
 	$(DEVICE_PATH)/overlay
-
-# Device properties
-$(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
-
-# These are the hardware-specific features
-PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/tablet_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/tablet_core_hardware.xml
-
-# Permissions
-PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.autofocus.xml
 
 # Audio
 PRODUCT_COPY_FILES += \
@@ -56,13 +46,16 @@ PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/audio/sound_trigger_mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_mixer_paths.xml \
 	$(DEVICE_PATH)/audio/sound_trigger_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_platform_info.xml
 
+# Boot animation
+TARGET_SCREEN_HEIGHT := 1920
+TARGET_SCREEN_WIDTH := 1200
+
+# Device properties
+$(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
+
 # Init
 PRODUCT_PACKAGES += \
 	libinit_clover
-
-# Sensors
-PRODUCT_COPY_FILES += \
-	$(DEVICE_PATH)/sensors/sensor_def_qcomdev.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/sensor_def_qcomdev.conf
 
 # Keylayouts
 PRODUCT_COPY_FILES += \
@@ -81,6 +74,10 @@ PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml \
 	$(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
 
+# Permissions
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.autofocus.xml
+
 # Ramdisk
 PRODUCT_PACKAGES += \
 	init.device.rc \
@@ -90,14 +87,18 @@ PRODUCT_PACKAGES += \
 PRODUCT_AAPT_CONFIG := large
 PRODUCT_AAPT_PREF_CONFIG := xhdpi
 
-# Boot animation
-TARGET_SCREEN_HEIGHT := 1920
-TARGET_SCREEN_WIDTH := 1200
+# Sensors
+PRODUCT_COPY_FILES += \
+	$(DEVICE_PATH)/sensors/sensor_def_qcomdev.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/sensor_def_qcomdev.conf
 
-# Include Vendor files
+# Tablet features
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/tablet_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/tablet_core_hardware.xml
+
+# Vendor files
 $(call inherit-product, vendor/xiaomi/clover/clover-vendor.mk)
 
-# Set those variables here to overwrite the inherited values.
+# AOSP DEVICE
 PRODUCT_NAME := aosp_clover
 PRODUCT_DEVICE := clover
 PRODUCT_MODEL := Mi PAD 4 (AOSP)
