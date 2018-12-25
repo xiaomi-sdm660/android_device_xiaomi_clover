@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 CarbonROM
+# Copyright (C) 2018 The Xiaomi-SDM660 Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@
 # definition file).
 #
 
-# inherit MI PAD 4 CarbonRom device config
+# inherit MI PAD 4 HAVOC-OS device config
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/havoc_clover.mk

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 CarbonROM
+# Copyright (C) 2018 The Xiaomi-SDM660 Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ TARGET_TAP_TO_WAKE_NODE := "/sys/devices/soc/c177000.i2c/i2c-3/3-0038/fts_gestur
 TARGET_INIT_VENDOR_LIB := libinit_clover
 TARGET_RECOVERY_DEVICE_MODULES := libinit_clover
 
-# Manifest 
+# Manifest
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 
 # Security patch level
