@@ -24,6 +24,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+on property:persist.sys.fp.vendor=none
+	mount none /dev/null /vendor/etc/permissions/android.hardware.fingerprint.xml bind
+	mount none /dev/null /vendor/framework/com.fingerprints.extension.jar bind
+	mount none /dev/null /vendor/etc/permissions/com.fingerprints.extension.xml bind
+	mount none /dev/null /vendor/app/FingerprintExtensionService/FingerprintExtensionService.apk bind
+	stop vendor.fps_hal
   
 # Set max charge current
 on property:sys.incall=true
