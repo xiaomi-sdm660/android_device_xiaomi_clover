@@ -61,10 +61,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/keylayout/uinput-fpc.kl:system/usr/keylayout/uinput-fpc.kl
 
-# Lights
-PRODUCT_PACKAGES += \
-	android.hardware.light@2.0-service.xiaomi_clover
-
 # Media
 PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/media/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml \
