@@ -57,10 +57,6 @@ $(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
 PRODUCT_PACKAGES += \
 	libinit_clover
 
-# Keylayouts
-PRODUCT_COPY_FILES += \
-	$(DEVICE_PATH)/keylayout/uinput-fpc.kl:system/usr/keylayout/uinput-fpc.kl
-
 # Media
 PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/media/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml \
