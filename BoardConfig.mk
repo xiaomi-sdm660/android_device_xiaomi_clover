@@ -27,7 +27,7 @@ include device/xiaomi/sdm660-common/PlatformConfig.mk
 DEVICE_PATH := device/xiaomi/clover
 
 # DT2W
-TARGET_TAP_TO_WAKE_NODE := "/sys/devices/soc/c177000.i2c/i2c-3/3-0038/fts_gesture_mode"
+TARGET_TAP_TO_WAKE_NODE := "/proc/touchscreen/enable_dt2w"
 
 # Kernel
 TARGET_KERNEL_SOURCE := kernel/xiaomi/clover

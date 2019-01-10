@@ -52,8 +52,8 @@ on boot
 	start macaddress_setup
 
 # Set permission for double tap to wake support
-    chown system system /sys/devices/soc/c177000.i2c/i2c-3/3-0038/fts_gesture_mode
-    chmod 0660 /sys/devices/soc/c177000.i2c/i2c-3/3-0038/fts_gesture_mode
+    chmod 0660 /proc/touchscreen/enable_dt2w
+    chown system system /proc/touchscreen/enable_dt2w
 	
 service macaddress_setup /vendor/bin/sh /vendor/bin/init.macaddress_setup.sh
    class main
