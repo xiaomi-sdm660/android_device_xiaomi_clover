@@ -108,12 +108,12 @@ void vendor_load_properties()
     if (hw_device.find("D9P") != std::string::npos) {
         property_override("persist.sys.fp.vendor", "fpc");
         property_override("ro.board.variant", "d9p");
-        property_override("ro.sf.lcd_density", "265");
+        property_override("vendor.display.lcd_density", "265");
         property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4 PLUS");
     } else {
         property_override("persist.sys.fp.vendor", "none");
         property_override("ro.board.variant", "d9");
-        property_override("ro.sf.lcd_density", "320");
+        property_override("vendor.display.lcd_density", "320");
         property_override_dual("ro.product.model", "ro.vendor.product.model", "MI PAD 4");
     }
 
