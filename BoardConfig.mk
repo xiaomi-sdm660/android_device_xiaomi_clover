@@ -44,4 +44,4 @@ TARGET_INIT_VENDOR_LIB := libinit_clover
 TARGET_RECOVERY_DEVICE_MODULES := libinit_clover
 
 # Vendor Security patch level
-VENDOR_SECURITY_PATCH := 2018-10-01
+VENDOR_SECURITY_PATCH := 2018-12-01
