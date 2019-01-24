@@ -27,20 +27,49 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-MACADDRESS=/persist/wlan_mac.bin
-MACADDRESSVENDOR=/vendor/firmware/wlan/qca_cld/wlan_mac.bin
+CLOVERMAC=/persist/wlan_mac.clover
+WLAN_MAC_BIN=/persist/wlan_mac.bin
+MACADDRESSBIN=/persist/wlan_bt/wlan.mac
+INTFSTR0="Intf0MacAddress="
+MAC0=000AF58989FF
 
-# Mount vendor with read write permission
-mount -o remount,rw /vendor 
+get_mac () {
+  if [ -f $MACADDRESSBIN ]; then
+    realMac=$(printf "%b"  | od -An -t x1 -w6 -N6  $MACADDRESSBIN | tr -d '\n ')
+  else
+    if [ -f $WLAN_MAC_BIN ]; then
+        checkMac=$(printf "%b"  | od -An -t x1 -w6 -N6  $CLOVERMAC | tr -d '\n ')
+        if [ $checkMac != $MAC0 ] && [ "${checkMac:0:2}" != "49" ]; then
+          realMac=$checkMac
+        fi
+    else
+        realMac=$MAC0
+    fi
+  fi
+}
 
-# Remove old wlan_mac.bin file in vendor
-rm -f /vendor/firmware/wlan/qca_cld/wlan_mac.bin
+wlan_mac () {
+    wlanMac=$(head -n 1 $CLOVERMAC)
+    wlanMac=$(echo -e "${wlanMac//$INTFSTR0}")
+}
 
-# Read out  WiFi Mac Address
-macaddr=$(printf "%b"  | od -An -t x1 -w6 -N6  $MACADDRESS | tr -d '\n ')
+write_mac () {
+        echo -e  "$INTFSTR0""$realMac" >$CLOVERMAC
+        echo -e  "END">>$CLOVERMAC
+        chown wifi $CLOVERMAC
+        chgrp wifi $CLOVERMAC
+}
 
-# Write new Mac Adress in Vendor
-echo -e  "Intf0MacAddress=$macaddr" "\nEND">$MACADDRESSVENDOR
-
-# Mount vendor with read only permission
-mount -o remount,ro /vendor
+if [ -f $CLOVERMAC ]; then
+    get_mac
+    wlan_mac
+    if [ "${realMac:0:6}" == "${wlanMac:0:6}" ] && [ "${wlanMac:0:2}" != "49" ]; then
+        exit 1
+    else
+        get_mac
+        write_mac
+    fi
+else
+    get_mac
+    write_mac
+fi
