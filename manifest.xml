@@ -288,7 +288,7 @@
             <name>IUsb</name>
             <instance>default</instance>
         </interface>
-    </hal>  
+    </hal>
     <hal format="hidl">
         <name>android.hardware.wifi</name>
         <transport>hwbinder</transport>
@@ -654,6 +654,15 @@
             <instance>imsrtpservice</instance>
         </interface>
     </hal>
+    <hal format="hidl">
+         <name>vendor.xiaomi.hardware.mlipay</name>
+         <transport>hwbinder</transport>
+         <version>1.0</version>
+         <interface>
+             <name>IMlipayService</name>
+             <instance>default</instance>
+         </interface>
+     </hal>
     <sepolicy>
         <version>27.0</version>
     </sepolicy>
