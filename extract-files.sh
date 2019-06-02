@@ -30,4 +30,8 @@ export VENDOR=xiaomi
 
 export DEVICE_BRINGUP_YEAR=2018
 
+DEVICE_BLOB_ROOT="$LINEAGE_ROOT"/vendor/"$VENDOR"/"$DEVICE"/proprietary
+patchelf --remove-needed libandroid.so "$DEVICE_BLOB_ROOT"/vendor/lib/libmmcamera_bokeh.so
+patchelf --remove-needed libgui.so "$DEVICE_BLOB_ROOT"/vendor/lib/libmmcamera_ppeiscore.so
+
 "./../../${VENDOR}/${DEVICE_COMMON}/extract-files.sh" "$@"
