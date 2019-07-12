@@ -31,7 +31,7 @@ on property:persist.sys.fp.vendor=none
 	mount none /dev/null /vendor/etc/permissions/com.fingerprints.extension.xml bind
 	mount none /dev/null /vendor/app/FingerprintExtensionService/FingerprintExtensionService.apk bind
 	stop vendor.fps_hal
-	
+
 on property:ro.vendor.radio.noril=yes
 	mount none /dev/null /system/app/CarrierDefaultApp/CarrierDefaultApp.apk bind
 	mount none /dev/null /system/app/messaging/messaging.apk bind
@@ -40,21 +40,25 @@ on property:ro.vendor.radio.noril=yes
 	mount none /dev/null /system/priv-app/CallLogBackup/CallLogBackup.apk bind
 	mount none /dev/null /system/priv-app/CellBroadcastReceiver/CellBroadcastReceiver.apk bind
 	mount none /dev/null /system/priv-app/EmergencyInfo/EmergencyInfo.apk bind
-	
+
 # Set max charge current
 on property:sys.incall=true
     write /sys/class/power_supply/battery/constant_charge_current_max 500000
 
 on property:sys.incall=false
     write /sys/class/power_supply/battery/constant_charge_current_max 1000000
-    
+
 on boot
 	start macaddress_setup
 
 # Set permission for double tap to wake support
     chmod 0660 /proc/touchscreen/enable_dt2w
     chown system system /proc/touchscreen/enable_dt2w
-	
+
+# Camera ID
+    setprop persist.vendor.camera.exif.model "Mi PAD 4"
+    setprop persist.sys.exif.model "Mi PAD 4"
+
 service macaddress_setup /vendor/bin/sh /vendor/bin/init.macaddress_setup.sh
    class main
    user root
