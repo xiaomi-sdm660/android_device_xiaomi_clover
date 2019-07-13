@@ -62,10 +62,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	debug.sf.recomputecrop=0 \
 	debug.vds.allow_hwc=0
 
-# Media
-PRODUCT_PROPERTY_OVERRIDES += \
-	vendor.mm.enable.qcom_parser=13631487
-
 # System property for color temperature
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.colorpick_adjust=true \
@@ -78,4 +74,3 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Ultra Sound
 PRODUCT_PROPERTY_OVERRIDES += \
 	audio.chk.cal.us=0
-
