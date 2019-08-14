@@ -32,6 +32,7 @@ TARGET_TAP_TO_WAKE_NODE := "/proc/touchscreen/enable_dt2w"
 # Kernel
 TARGET_KERNEL_SOURCE := kernel/xiaomi/clover
 TARGET_KERNEL_CONFIG := clover-perf_defconfig
+TW_USE_TOOLBOX := true
 
 # Platform
 BOARD_VENDOR_PLATFORM := xiaomi-sdm660
