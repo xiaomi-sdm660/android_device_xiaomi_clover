@@ -46,10 +46,6 @@ TARGET_SCREEN_WIDTH := 1200
 # Device properties
 $(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
 
-# Init
-PRODUCT_PACKAGES += \
-	libinit_clover
-
 # Media
 PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
