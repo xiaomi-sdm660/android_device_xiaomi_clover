@@ -55,7 +55,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.radio.VT_CAM_INTERFACE=1 \
-	persist.camera.stats.test=5
+	persist.camera.stats.test=5 \
+	persist.camera.HAL3.enabled=1 
 
 # Display
 PRODUCT_PROPERTY_OVERRIDES += \
