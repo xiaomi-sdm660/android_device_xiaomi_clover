@@ -27,9 +27,9 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CLOVERMAC=/persist/wlan_mac.clover
-WLAN_MAC_BIN=/persist/wlan_mac.bin
-MACADDRESSBIN=/persist/wlan_bt/wlan.mac
+CLOVERMAC=/mnt/vendor/persist/wlan_mac.clover
+WLAN_MAC_BIN=/mnt/vendor/persist/wlan_mac.bin
+MACADDRESSBIN=/mnt/vendor/persist/wlan_bt/wlan.mac
 INTFSTR0="Intf0MacAddress="
 MAC0=000AF58989FF
 
