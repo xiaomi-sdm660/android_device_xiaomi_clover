@@ -88,6 +88,17 @@
         <device name="SND_DEVICE_IN_HANDSET_DMIC" acdb_id="10004"/>
         <device name="SND_DEVICE_IN_HEADSET_MIC" acdb_id="10008"/>
         <device name="SND_DEVICE_IN_HANDSET_STEREO_DMIC" acdb_id="10010"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_EXTERNAL_1" acdb_id="14"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_EXTERNAL_2" acdb_id="14"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_VBAT" acdb_id="135"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_AND_HEADPHONES_EXTERNAL_1" acdb_id="10"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_AND_HEADPHONES_EXTERNAL_2" acdb_id="10"/>
+        <device name="SND_DEVICE_OUT_VOICE_SPEAKER_VBAT" acdb_id="135"/>
+        <device name="SND_DEVICE_OUT_VOICE_SPEAKER_2_VBAT" acdb_id="135"/>
+        <device name="SND_DEVICE_OUT_SPEAKER_AND_USB_HEADSET" acdb_id="45"/>
+        <device name="SND_DEVICE_IN_HDMI_MIC" acdb_id="4"/>
+        <device name="SND_DEVICE_IN_HANDSET_TMIC_FLUENCE_PRO" acdb_id="125"/>
+        <device name="SND_DEVICE_IN_HANDSET_TMIC" acdb_id="125"/>
     </acdb_ids>
     <backend_names>
         <device name="SND_DEVICE_OUT_HEADPHONES" backend="headphones" interface="INT0_MI2S_RX"/>
@@ -362,4 +373,3 @@
         </input_snd_device>
     </snd_devices>
 </audio_platform_info>
-
