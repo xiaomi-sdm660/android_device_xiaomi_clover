@@ -35,7 +35,6 @@ DEVICE_PATH := device/xiaomi/clover
 # Device identifier
 PRODUCT_BRAND := Xiaomi
 PRODUCT_MANUFACTURER := Xiaomi
-PRODUCT_PLATFORM := SDM660
 PRODUCT_NAME := lineage_clover
 PRODUCT_CHARACTERISTICS := tablet
 PRODUCT_DEVICE := clover
@@ -43,7 +42,6 @@ PRODUCT_MODEL := MI PAD 4
 
 # Build Fingerprint
 PRODUCT_BUILD_PROP_OVERRIDES += \
-	PRODUCT_NAME=clover \
 	PRIVATE_BUILD_DESC="wayne-user 9 PKQ1.180904.001 V10.3.4.0.PDCCNXM release-keys"
 
 BUILD_FINGERPRINT="xiaomi/wayne/wayne:9/PKQ1.180904.001/V10.3.4.0.PDCCNXM:user/release-keys"
