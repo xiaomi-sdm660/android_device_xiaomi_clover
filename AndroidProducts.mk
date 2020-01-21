@@ -23,9 +23,9 @@
 
 # inherit MI PAD 4 lineage-OS device config
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/carbon_clover.mk
+    $(LOCAL_DIR)/bliss_clover.mk
 
 COMMON_LUNCH_CHOICES := \
-		carbon_clover-eng \
-		carbon_clover-userdebug \
-		carbon_clover-user
+		bliss_clover-eng \
+		bliss_clover-userdebug \
+		bliss_clover-user
