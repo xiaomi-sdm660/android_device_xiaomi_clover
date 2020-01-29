@@ -40,6 +40,10 @@ TARGET_SCREEN_WIDTH := 1200
 # Device properties
 $(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
 
+# HW crypto
+PRODUCT_PACKAGES += \
+    vendor.qti.hardware.cryptfshw@1.0-service-qti.qsee
+
 # Media
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/media/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
