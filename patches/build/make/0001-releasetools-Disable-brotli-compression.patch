@@ -1,0 +1,57 @@
+From fec8f5e214ef7ac8b79d4421aa0bf545f953381b Mon Sep 17 00:00:00 2001
+From: Soul Trace <S-trace@list.ru>
+Date: Sun, 5 Apr 2020 01:20:21 +0300
+Subject: [PATCH] releasetools: Disable brotli compression
+
+It conflicts with OpenDelta
+
+Change-Id: I199f6b0720eed32fbe47d9d2d35015d0cf2a1863
+---
+ tools/releasetools/common.py | 28 +++-------------------------
+ 1 file changed, 3 insertions(+), 25 deletions(-)
+
+diff --git a/tools/releasetools/common.py b/tools/releasetools/common.py
+index 9f57773ba..5e01453b1 100644
+--- a/tools/releasetools/common.py
++++ b/tools/releasetools/common.py
+@@ -2139,34 +2139,12 @@ class BlockDifference(object):
+              '{}.transfer.list'.format(self.path),
+              '{}.transfer.list'.format(self.partition))
+ 
+-    # For full OTA, compress the new.dat with brotli with quality 6 to reduce
+-    # its size. Quailty 9 almost triples the compression time but doesn't
+-    # further reduce the size too much. For a typical 1.8G system.new.dat
+-    #                       zip  | brotli(quality 6)  | brotli(quality 9)
+-    #   compressed_size:    942M | 869M (~8% reduced) | 854M
+-    #   compression_time:   75s  | 265s               | 719s
+-    #   decompression_time: 15s  | 25s                | 25s
+-
+-    if not self.src:
+-      brotli_cmd = ['brotli', '--quality=6',
+-                    '--output={}.new.dat.br'.format(self.path),
+-                    '{}.new.dat'.format(self.path)]
+-      print("Compressing {}.new.dat with brotli".format(self.partition))
+-      RunAndCheckOutput(brotli_cmd)
+-
+-      new_data_name = '{}.new.dat.br'.format(self.partition)
+-      ZipWrite(output_zip,
+-               '{}.new.dat.br'.format(self.path),
+-               new_data_name,
+-               compress_type=zipfile.ZIP_STORED)
+-    else:
+-      new_data_name = '{}.new.dat'.format(self.partition)
+-      ZipWrite(output_zip, '{}.new.dat'.format(self.path), new_data_name)
++    new_data_name = '{}.new.dat'.format(self.partition)
++    ZipWrite(output_zip, '{}.new.dat'.format(self.path), new_data_name)
+ 
+     ZipWrite(output_zip,
+              '{}.patch.dat'.format(self.path),
+-             '{}.patch.dat'.format(self.partition),
+-             compress_type=zipfile.ZIP_STORED)
++             '{}.patch.dat'.format(self.partition))
+ 
+     if self.partition == "system":
+       code = ErrorCode.SYSTEM_UPDATE_FAILURE
+-- 
+2.20.1
+

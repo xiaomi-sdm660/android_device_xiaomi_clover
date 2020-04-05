@@ -48,12 +48,17 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/keylayout/sdm660-snd-card_Button_Jack.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/sdm660-snd-card_Button_Jack.kl
 
+# OpenDelta
+PRODUCT_PACKAGES += \
+    OpenDelta
+
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(DEVICE_PATH)/overlay
 
 # Permissions
 PRODUCT_COPY_FILES += \
+    device/xiaomi/clover/rootdir/etc/permissions/eu.chainfire.opendelta.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/eu.chainfire.opendelta.xml \
     frameworks/native/data/etc/android.hardware.camera.autofocus.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.autofocus.xml
 
 # Ramdisk
