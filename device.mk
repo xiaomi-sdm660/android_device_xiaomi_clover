@@ -37,6 +37,10 @@ PRODUCT_COPY_FILES += \
 TARGET_SCREEN_HEIGHT := 1920
 TARGET_SCREEN_WIDTH := 1200
 
+# Changelog
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/rootdir/etc/CHANGES.txt:$(TARGET_COPY_OUT_SYSTEM)/etc/CHANGES.txt
+
 # Device properties
 $(call inherit-product, $(DEVICE_PATH)/device_prop.mk)
 

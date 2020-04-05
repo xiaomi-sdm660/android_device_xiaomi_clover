@@ -4,9 +4,69 @@ echo "Checking repos"
 # prebuilts/clang/host/linux-x86 will report this each time, because of clang-r377782b 
 LANG=C repo forall -c 'git diff-index --quiet HEAD -- || echo "$REPO_PATH have uncommited changes"; git ls-files --other --directory --exclude-standard | sed q1 >/dev/null || echo "$REPO_PATH have untracked files"; CHANGES=$(git log --oneline --reverse m/lineage-17.1..HEAD|wc -l); [ 0"$CHANGES" -gt 0 ] && echo "$REPO_PATH have $CHANGES new commits after last repo sync"' 2>/dev/null | grep -v 'prebuilts/clang/host/linux-x86 have untracked files'
 
+
 echo "Generating manifest"
 repo manifest -r -o "device/xiaomi/clover/rootdir/etc/build-manifest.xml" 2>/dev/null
 echo "Generating manifest: done"
+
+do_one_diff() {
+  ts="$1"
+  nextts="$2"
+  version="$3"
+  nextversion="$4"
+  if [ -z "$nextts" ]; then
+    echo "==================================="
+    echo "Since $(LC_ALL=C date -u -d @"$ts") ($version)"
+    echo "==================================="
+    # shellcheck disable=SC2016
+    repo forall -c 'L=$(git log --oneline --after "$ts" -n 1); if [ "n$L" != "n" ]; then echo; echo "   * $REPO_PATH"; git log --oneline --after "$ts"|tac; fi' 2>/dev/null
+  else
+    echo "==================================="
+    echo "Since $(LC_ALL=C date -u -d @"$ts") and before $(LC_ALL=C date -u -d @"$nextts") ($version to $nextversion)"
+    echo "==================================="
+    # shellcheck disable=SC2016
+    repo forall -c 'L=$(git log --oneline --after "$ts" --before "$nextts" -n 1); if [ "n$L" != "n" ]; then echo; echo "   * $REPO_PATH"; git log --oneline --after "$ts" --before "$nextts"|tac; fi' 2>/dev/null
+  fi
+  echo
+}
+
+build_changelog() {
+  PREVIOUS_BUILDS_LIST="$1"
+  export CHANGESPATH="$2"
+  rm -f "$CHANGESPATH"
+  touch "$CHANGESPATH"
+  if ! [ -f "$PREVIOUS_BUILDS_LIST" ]; then
+    echo "No previous build detected, skipping changelog building"
+    echo "First build for this version" > "$CHANGESPATH"
+    return
+  fi
+  export nextts=""
+  export ts=""
+  while read nextversion nextts; do
+      if [ ! -z "$ts" ]; then
+        echo "Processing $version from $(LANG=C date -u -d @"$ts")"
+        do_one_diff "$ts" "$nextts" "$version" "$nextversion" > /tmp/current_changelog.txt
+        mv "$CHANGESPATH" /tmp/temporary.txt
+        cat /tmp/current_changelog.txt /tmp/temporary.txt > "$CHANGESPATH"
+        rm /tmp/current_changelog.txt /tmp/temporary.txt
+      fi
+      export version="$nextversion"
+      export ts="$nextts"
+  done < "$PREVIOUS_BUILDS_LIST"
+
+  tail -n1 "$PREVIOUS_BUILDS_LIST"|read version ts
+  echo "Processing $version from $(LANG=C date -u -d @"$ts")"
+  do_one_diff "$ts" "" "$version" "" > /tmp/current_changelog.txt
+  mv "$CHANGESPATH" /tmp/temporary.txt
+  cat /tmp/current_changelog.txt /tmp/temporary.txt > "$CHANGESPATH"
+  rm /tmp/current_changelog.txt /tmp/temporary.txt
+}
+
+if [ -f "device/xiaomi/clover/previous_builds.txt" ]; then
+	echo "Building changelog"
+	build_changelog "device/xiaomi/clover/previous_builds.txt" "device/xiaomi/clover/rootdir/etc/CHANGES.txt"
+	echo "Building changelog: done"
+fi
 
 echo "Applying patches"
 patches_path="$build_root/device/xiaomi/clover/patches/"
