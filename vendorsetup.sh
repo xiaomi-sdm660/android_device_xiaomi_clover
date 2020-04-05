@@ -4,6 +4,10 @@ echo "Checking repos"
 # prebuilts/clang/host/linux-x86 will report this each time, because of clang-r377782b 
 LANG=C repo forall -c 'git diff-index --quiet HEAD -- || echo "$REPO_PATH have uncommited changes"; git ls-files --other --directory --exclude-standard | sed q1 >/dev/null || echo "$REPO_PATH have untracked files"; CHANGES=$(git log --oneline --reverse m/lineage-17.1..HEAD|wc -l); [ 0"$CHANGES" -gt 0 ] && echo "$REPO_PATH have $CHANGES new commits after last repo sync"' 2>/dev/null | grep -v 'prebuilts/clang/host/linux-x86 have untracked files'
 
+echo "Generating manifest"
+repo manifest -r -o "device/xiaomi/clover/rootdir/etc/build-manifest.xml" 2>/dev/null
+echo "Generating manifest: done"
+
 echo "Applying patches"
 patches_path="$build_root/device/xiaomi/clover/patches/"
 pushd "$patches_path" > /dev/null

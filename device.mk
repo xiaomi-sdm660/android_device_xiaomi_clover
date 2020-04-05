@@ -48,6 +48,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/keylayout/sdm660-snd-card_Button_Jack.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/sdm660-snd-card_Button_Jack.kl
 
+# Manifest
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/rootdir/etc/build-manifest.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/build-manifest.xml
+
 # OpenDelta
 PRODUCT_PACKAGES += \
     OpenDelta
