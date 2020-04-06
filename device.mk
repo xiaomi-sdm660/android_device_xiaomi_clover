@@ -56,17 +56,12 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/rootdir/etc/build-manifest.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/build-manifest.xml
 
-# OpenDelta
-PRODUCT_PACKAGES += \
-    OpenDelta
-
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(DEVICE_PATH)/overlay
 
 # Permissions
 PRODUCT_COPY_FILES += \
-    device/xiaomi/clover/rootdir/etc/permissions/eu.chainfire.opendelta.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/eu.chainfire.opendelta.xml \
     frameworks/native/data/etc/android.hardware.camera.autofocus.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.autofocus.xml
 
 # Ramdisk
