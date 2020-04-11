@@ -34,5 +34,9 @@
     "repository":  "crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6207600",
     "target_path": "prebuilts/clang/host/linux-x86/clang-r377782b",
     "branch":      "10.0"
+  },
+  {
+    "repository": "android_packages_resources_devicesettings",
+    "target_path": "packages/resources/devicesettings"
   }
 ]

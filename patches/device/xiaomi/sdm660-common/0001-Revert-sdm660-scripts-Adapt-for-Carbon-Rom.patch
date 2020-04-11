@@ -1,7 +1,7 @@
 From 83a06b515f8dcb142e0ef7d68649cbbde3c15936 Mon Sep 17 00:00:00 2001
 From: Soul Trace <S-trace@list.ru>
 Date: Fri, 3 Apr 2020 18:28:41 +0300
-Subject: [PATCH 2/2] Revert "sdm660: scripts: Adapt for Carbon Rom"
+Subject: [PATCH] Revert "sdm660: scripts: Adapt for Carbon Rom"
 
 This reverts commit 58fcc01265e8cd796a7eae60f4dd5d17d27f5eaa.
 ---
