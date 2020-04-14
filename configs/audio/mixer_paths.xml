@@ -2419,6 +2419,28 @@
         <path name="speaker-and-headphones-liquid" />
     </path>
 
+    <path name="spkr-gain-in-headphone-combo">
+        <ctl name="Left Speaker Gain" value="24" />
+        <ctl name="Right Speaker Gain" value="24" />
+    </path>
+
+    <path name="speaker-gain-default">
+        <ctl name="Left Speaker Gain" value="24" />
+        <ctl name="Right Speaker Gain" value="24" />
+    </path>
+
+    <path name="spkr-gain-in-line-combo">
+        <path name="spkr-gain-in-headphone-combo" />
+    </path>
+
+    <path name="spkr-safe-gain-in-line-combo">
+        <path name="speaker-and-headphones" />
+    </path>
+
+    <path name="spkr-safe-gain-in-headphone-combo">
+        <path name="speaker-and-headphones" />
+    </path>
+
     <path name="usb-headphones">
     </path>
 
