@@ -405,6 +405,10 @@ vendor/lib/hw/android.hardware.keymaster@3.0-impl-qti.so
 vendor/lib64/hw/keystore.sdm660.so
 vendor/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so
 
+# Sensors - from jasmine-user-10-QKQ1.190910.002-V11.0.4.0.QDIMIXM
+vendor/lib/sensors.ssc.so|69970f125d076dac8711c1d1687f7faeb7a75bed
+vendor/lib64/sensors.ssc.so|0ec630386e5f51dfe77acd0fc7886f01dcfc2c86
+
 # Thermal (Configs)
 vendor/etc/thermal-engine-battery.conf
 vendor/etc/thermal-engine-battery2.conf
