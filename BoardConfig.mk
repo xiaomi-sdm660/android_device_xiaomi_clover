@@ -29,12 +29,9 @@ DEVICE_PATH := device/xiaomi/clover
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := true
 
-# DT2W
-TARGET_TAP_TO_WAKE_NODE := "/proc/touchscreen/enable_dt2w"
-
 # Kernel
-TARGET_KERNEL_SOURCE := kernel/xiaomi/clover
-TARGET_KERNEL_CONFIG := clover-perf_defconfig
+TARGET_KERNEL_SOURCE := kernel/xiaomi/sdm660
+TARGET_KERNEL_CONFIG := clover_defconfig
 
 # Manifest
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml
