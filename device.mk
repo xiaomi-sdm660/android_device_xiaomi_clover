@@ -84,6 +84,10 @@ PRODUCT_SOONG_NAMESPACES += \
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/tablet_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/tablet_core_hardware.xml
 
+# Wifi
+PRODUCT_PACKAGES += \
+    CloverWifiOverlay
+
 # Vendor files
 $(call inherit-product, vendor/xiaomi/clover/clover-vendor.mk)
 
