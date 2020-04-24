@@ -5,8 +5,8 @@
     "revision":    "cr-8.0"
   },
   {
-    "repository":  "CarbonROM/android_kernel_xiaomi_clover",
-    "target_path": "kernel/xiaomi/clover",
+    "repository":  "CarbonROM/android_kernel_xiaomi_sdm660",
+    "target_path": "kernel/xiaomi/sdm660",
     "revision":    "cr-8.0"
   },
   {
