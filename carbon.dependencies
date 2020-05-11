@@ -13,6 +13,6 @@
     "remote":      "gh",
     "repository":  "xiaomi-sdm660/android_vendor_xiaomi_Miuicamera",
     "target_path": "vendor/xiaomi/MiuiCamera",
-    "revision":    "lineage-17.0"
+    "revision":    "master"
   }
 ]
