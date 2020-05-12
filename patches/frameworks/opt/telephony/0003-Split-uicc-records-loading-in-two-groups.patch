@@ -1,0 +1,592 @@
+From d2195cdb750e63ebd59f4b00c67d50042009466b Mon Sep 17 00:00:00 2001
+From: Avinash Nalluri <anallu@codeaurora.org>
+Date: Sat, 5 Oct 2019 14:29:30 -0700
+Subject: [PATCH 3/3] Split uicc records loading in two groups.
+
+Add the apis related to split of UICC records in two
+groups. The first group constitutes records knowns as essential records.
+Basically, essential from the data call establishment perspective. Remaining
+records are moved to second group.
+
+Records reading is sequential so essential records are read prior to other records.
+
+Also introduced registrant apis to get notified when these few essential records
+are read. SIM, RUIM and ISIM identified different set of records as essential.
+
+The current grouping is based on heuristic and can be tuned in future based on
+field trials.
+
+Change-Id: Ic8fa54b33f97365999bd19dcfcfed319bc88a0ab
+CRs-Fixed: 2568904
+---
+ .../telephony/dataconnection/DcTracker.java   | 17 +++--
+ .../internal/telephony/uicc/IccRecords.java   | 42 +++++++++++
+ .../telephony/uicc/IsimUiccRecords.java       | 23 +++++-
+ .../internal/telephony/uicc/RuimRecords.java  | 60 +++++++++++----
+ .../internal/telephony/uicc/SIMRecords.java   | 75 +++++++++++++------
+ 5 files changed, 170 insertions(+), 47 deletions(-)
+
+diff --git a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
+index 4adee1a77..4b2e27b51 100644
+--- a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
++++ b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
+@@ -248,7 +248,7 @@ public class DcTracker extends Handler {
+     // Default sent packets without ack which triggers initial recovery steps
+     private static final int NUMBER_SENT_PACKETS_OF_HANG = 10;
+ 
+-    private static final int EVENT_SIM_RECORDS_LOADED = 100;
++    private static final int EVENT_ESSENTIAL_SIM_RECORDS_LOADED = 100;
+ 
+     // Default for the data stall alarm while non-aggressive stall detection
+     private static final int DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 6;
+@@ -1278,7 +1278,8 @@ public class DcTracker extends Handler {
+             radioStateFromCarrier = true;
+         }
+ 
+-        boolean recordsLoaded = mIccRecords.get() != null && mIccRecords.get().getRecordsLoaded();
++        boolean recordsLoaded = mIccRecords.get() != null
++                && mIccRecords.get().getEssentialRecordsLoaded();
+ 
+         boolean defaultDataSelected = SubscriptionManager.isValidSubscriptionId(
+                 SubscriptionManager.getDefaultDataSubscriptionId());
+@@ -3473,7 +3474,7 @@ public class DcTracker extends Handler {
+         if (mSubscriptionManager.isActiveSubId(subId)) {
+             onRecordsLoadedOrSubIdChanged();
+         } else {
+-            log("Ignoring EVENT_RECORDS_LOADED as subId is not valid: " + subId);
++            log("Ignoring EVENT_ESSENTIAL_SIM_RECORDS_LOADED as subId is not valid: " + subId);
+         }
+     }
+ 
+@@ -3490,16 +3491,18 @@ public class DcTracker extends Handler {
+             case DctConstants.EVENT_RECORDS_LOADED:
+                 mSimRecords = mPhone.getSIMRecords();
+                 if ((mIccRecords.get() instanceof RuimRecords) && (mSimRecords != null)) {
+-                    mSimRecords.registerForRecordsLoaded(this, EVENT_SIM_RECORDS_LOADED, null);
++                    mSimRecords.registerForEssentialRecordsLoaded(
++                        this, EVENT_ESSENTIAL_SIM_RECORDS_LOADED, null);
+                 } else {
+                     onRecordsLoaded();
+                 }
+                 break;
+ 
+-            case EVENT_SIM_RECORDS_LOADED:
++            case EVENT_ESSENTIAL_SIM_RECORDS_LOADED:
++                if (DBG) log("EVENT_ESSENTIAL_SIM_RECORDS_LOADED");
+                 onRecordsLoaded();
+                 if (mSimRecords != null) {
+-                    mSimRecords.unregisterForRecordsLoaded(this);
++                    mSimRecords.unregisterForEssentialRecordsLoaded(this);
+                     mSimRecords = null;
+                 }
+                 break;
+@@ -3902,7 +3905,7 @@ public class DcTracker extends Handler {
+                 if (mSubscriptionManager.isActiveSubId(mPhone.getSubId())) {
+                     log("New records found.");
+                     mIccRecords.set(newIccRecords);
+-                    newIccRecords.registerForRecordsLoaded(
++                    newIccRecords.registerForEssentialRecordsLoaded(
+                             this, DctConstants.EVENT_RECORDS_LOADED, null);
+                 }
+             } else {
+diff --git a/src/java/com/android/internal/telephony/uicc/IccRecords.java b/src/java/com/android/internal/telephony/uicc/IccRecords.java
+index 7944f6f4d..7d432aef0 100644
+--- a/src/java/com/android/internal/telephony/uicc/IccRecords.java
++++ b/src/java/com/android/internal/telephony/uicc/IccRecords.java
+@@ -92,6 +92,7 @@ public abstract class IccRecords extends Handler implements IccConstants {
+     protected TelephonyManager mTelephonyManager;
+ 
+     protected RegistrantList mRecordsLoadedRegistrants = new RegistrantList();
++    protected RegistrantList mEssentialRecordsLoadedRegistrants = new RegistrantList();
+     protected RegistrantList mLockedRecordsLoadedRegistrants = new RegistrantList();
+     protected RegistrantList mNetworkLockedRecordsLoadedRegistrants = new RegistrantList();
+     protected RegistrantList mImsiReadyRegistrants = new RegistrantList();
+@@ -102,6 +103,12 @@ public abstract class IccRecords extends Handler implements IccConstants {
+     protected RegistrantList mSpnUpdatedRegistrants = new RegistrantList();
+     protected RegistrantList mRecordsOverrideRegistrants = new RegistrantList();
+ 
++    @UnsupportedAppUsage
++    protected boolean mEssentialRecordsListenerNotified;
++
++    @UnsupportedAppUsage
++    protected int mEssentialRecordsToLoad;  // number of pending essential records load requests
++
+     @UnsupportedAppUsage
+     protected int mRecordsToLoad;  // number of pending load requests
+ 
+@@ -232,6 +239,7 @@ public abstract class IccRecords extends Handler implements IccConstants {
+                 + " mCi=" + mCi
+                 + " mFh=" + mFh
+                 + " mParentApp=" + mParentApp
++                + " mEssentialRecordsToLoad=" + mEssentialRecordsToLoad
+                 + " recordsToLoad=" + mRecordsToLoad
+                 + " adnCache=" + mAdnCache
+                 + " recordsRequested=" + mRecordsRequested
+@@ -370,6 +378,20 @@ public abstract class IccRecords extends Handler implements IccConstants {
+         return mFullIccId;
+     }
+ 
++    @UnsupportedAppUsage
++    public void registerForEssentialRecordsLoaded(Handler h, int what, Object obj) {
++        if (mDestroyed.get()) {
++            return;
++        }
++
++        Registrant r = new Registrant(h, what, obj);
++        mEssentialRecordsLoadedRegistrants.add(r);
++
++        if (getEssentialRecordsLoaded()) {
++            r.notifyRegistrant(new AsyncResult(null, null, null));
++        }
++    }
++
+     @UnsupportedAppUsage
+     public void registerForRecordsLoaded(Handler h, int what, Object obj) {
+         if (mDestroyed.get()) {
+@@ -383,6 +405,12 @@ public abstract class IccRecords extends Handler implements IccConstants {
+             r.notifyRegistrant(new AsyncResult(null, null, null));
+         }
+     }
++
++    @UnsupportedAppUsage
++    public void unregisterForEssentialRecordsLoaded(Handler h) {
++        mEssentialRecordsLoadedRegistrants.remove(h);
++    }
++
+     @UnsupportedAppUsage
+     public void unregisterForRecordsLoaded(Handler h) {
+         mRecordsLoadedRegistrants.remove(h);
+@@ -771,6 +799,11 @@ public abstract class IccRecords extends Handler implements IccConstants {
+      */
+     public abstract void onRefresh(boolean fileChanged, int[] fileList);
+ 
++    @UnsupportedAppUsage
++    public boolean getEssentialRecordsLoaded() {
++        return mEssentialRecordsToLoad == 0 && mRecordsRequested;
++    }
++
+     @UnsupportedAppUsage
+     public boolean getRecordsLoaded() {
+         return mRecordsToLoad == 0 && mRecordsRequested;
+@@ -919,6 +952,8 @@ public abstract class IccRecords extends Handler implements IccConstants {
+ 
+     protected abstract void onRecordLoaded();
+ 
++    protected abstract void onAllEssentialRecordsLoaded();
++
+     protected abstract void onAllRecordsLoaded();
+ 
+     /**
+@@ -1187,6 +1222,12 @@ public abstract class IccRecords extends Handler implements IccConstants {
+         pw.println(" mCi=" + mCi);
+         pw.println(" mFh=" + mFh);
+         pw.println(" mParentApp=" + mParentApp);
++        pw.println(" mEssentialRecordsLoadedRegistrants: size="
++                + mEssentialRecordsLoadedRegistrants.size());
++        for (int i = 0; i < mEssentialRecordsLoadedRegistrants.size(); i++) {
++            pw.println("  mEssentialRecordsLoadedRegistrants[" + i + "]="
++                    + ((Registrant)mEssentialRecordsLoadedRegistrants.get(i)).getHandler());
++        }
+         pw.println(" recordsLoadedRegistrants: size=" + mRecordsLoadedRegistrants.size());
+         for (int i = 0; i < mRecordsLoadedRegistrants.size(); i++) {
+             pw.println("  recordsLoadedRegistrants[" + i + "]="
+@@ -1227,6 +1268,7 @@ public abstract class IccRecords extends Handler implements IccConstants {
+         }
+         pw.println(" mRecordsRequested=" + mRecordsRequested);
+         pw.println(" mLockedRecordsReqReason=" + mLockedRecordsReqReason);
++        pw.println(" mEssentialRecordsToLoad=" + mEssentialRecordsToLoad);
+         pw.println(" mRecordsToLoad=" + mRecordsToLoad);
+         pw.println(" mRdnCache=" + mAdnCache);
+ 
+diff --git a/src/java/com/android/internal/telephony/uicc/IsimUiccRecords.java b/src/java/com/android/internal/telephony/uicc/IsimUiccRecords.java
+index f75849dcc..b5b7b45e2 100644
+--- a/src/java/com/android/internal/telephony/uicc/IsimUiccRecords.java
++++ b/src/java/com/android/internal/telephony/uicc/IsimUiccRecords.java
+@@ -154,9 +154,16 @@ public class IsimUiccRecords extends IccRecords implements IsimRecords {
+         }
+     }
+ 
++    private void fetchEssentialIsimRecords() {
++        //NOP: No essential ISim records identified.
++    }
++
+     @UnsupportedAppUsage
+     protected void fetchIsimRecords() {
+         mRecordsRequested = true;
++        if (DBG) log("fetchIsimRecords " + mRecordsToLoad);
++
++        fetchEssentialIsimRecords();
+ 
+         mFh.loadEFTransparent(EF_IMPI, obtainMessage(
+                 IccRecords.EVENT_GET_ICC_RECORD_DONE, new EfIsimImpiLoaded()));
+@@ -289,13 +296,18 @@ public class IsimUiccRecords extends IccRecords implements IsimRecords {
+         mRecordsToLoad -= 1;
+         if (DBG) log("onRecordLoaded " + mRecordsToLoad + " requested: " + mRecordsRequested);
+ 
++        if (getEssentialRecordsLoaded() && !mEssentialRecordsListenerNotified) {
++            onAllEssentialRecordsLoaded();
++        }
++
+         if (getRecordsLoaded()) {
+             onAllRecordsLoaded();
+         } else if (getLockedRecordsLoaded() || getNetworkLockedRecordsLoaded()) {
+             onLockedAllRecordsLoaded();
+-        } else if (mRecordsToLoad < 0) {
++        } else if (mRecordsToLoad < 0 || mEssentialRecordsToLoad < 0) {
+             loge("recordsToLoad <0, programmer error suspected");
+             mRecordsToLoad = 0;
++            mEssentialRecordsToLoad = 0;
+         }
+     }
+ 
+@@ -312,9 +324,16 @@ public class IsimUiccRecords extends IccRecords implements IsimRecords {
+         }
+     }
+ 
++    @Override
++    protected void onAllEssentialRecordsLoaded() {
++        if (DBG) log("Essential record load complete");
++        mEssentialRecordsListenerNotified = true;
++        mEssentialRecordsLoadedRegistrants.notifyRegistrants(new AsyncResult(null, null, null));
++    }
++
+     @Override
+     protected void onAllRecordsLoaded() {
+-       if (DBG) log("record load complete");
++        if (DBG) log("record load complete");
+         mLoaded.set(true);
+         mRecordsLoadedRegistrants.notifyRegistrants(new AsyncResult(null, null, null));
+     }
+diff --git a/src/java/com/android/internal/telephony/uicc/RuimRecords.java b/src/java/com/android/internal/telephony/uicc/RuimRecords.java
+index 832349438..c69d7f4d8 100644
+--- a/src/java/com/android/internal/telephony/uicc/RuimRecords.java
++++ b/src/java/com/android/internal/telephony/uicc/RuimRecords.java
+@@ -376,6 +376,7 @@ public class RuimRecords extends IccRecords {
+ 
+         @Override
+         public void onRecordLoaded(AsyncResult ar) {
++            mEssentialRecordsToLoad -= 1;
+             byte[] data = (byte[]) ar.result;
+             if (data == null || data.length < 10) {
+                 if (DBG) log("Invalid IMSI from EF_CSIM_IMSIM");
+@@ -664,6 +665,7 @@ public class RuimRecords extends IccRecords {
+             /* IO events */
+             case EVENT_GET_IMSI_DONE:
+                 isRecordLoadResponse = true;
++                mEssentialRecordsToLoad -= 1;
+ 
+                 ar = (AsyncResult)msg.obj;
+                 if (ar.exception != null) {
+@@ -715,6 +717,7 @@ public class RuimRecords extends IccRecords {
+ 
+             case EVENT_GET_ICCID_DONE:
+                 isRecordLoadResponse = true;
++                mEssentialRecordsToLoad -= 1;
+ 
+                 ar = (AsyncResult)msg.obj;
+                 data = (byte[])ar.result;
+@@ -793,13 +796,18 @@ public class RuimRecords extends IccRecords {
+         mRecordsToLoad -= 1;
+         if (DBG) log("onRecordLoaded " + mRecordsToLoad + " requested: " + mRecordsRequested);
+ 
++        if (getEssentialRecordsLoaded() && !mEssentialRecordsListenerNotified) {
++            onAllEssentialRecordsLoaded();
++        }
++
+         if (getRecordsLoaded()) {
+             onAllRecordsLoaded();
+         } else if (getLockedRecordsLoaded() || getNetworkLockedRecordsLoaded()) {
+             onLockedAllRecordsLoaded();
+-        } else if (mRecordsToLoad < 0) {
++        } else if (mRecordsToLoad < 0 || mEssentialRecordsToLoad < 0) {
+             loge("recordsToLoad <0, programmer error suspected");
+             mRecordsToLoad = 0;
++            mEssentialRecordsToLoad = 0;
+         }
+     }
+ 
+@@ -816,8 +824,8 @@ public class RuimRecords extends IccRecords {
+     }
+ 
+     @Override
+-    protected void onAllRecordsLoaded() {
+-        if (DBG) log("record load complete");
++    protected void onAllEssentialRecordsLoaded() {
++        if (DBG) log("Essential record load complete");
+ 
+         // Further records that can be inserted are Operator/OEM dependent
+ 
+@@ -825,26 +833,34 @@ public class RuimRecords extends IccRecords {
+         if (false) {
+             String operator = getRUIMOperatorNumeric();
+             if (!TextUtils.isEmpty(operator)) {
+-                log("onAllRecordsLoaded set 'gsm.sim.operator.numeric' to operator='" +
++                log("onAllEssentialRecordsLoaded set 'gsm.sim.operator.numeric' to operator='" +
+                         operator + "'");
+                 log("update icc_operator_numeric=" + operator);
+                 mTelephonyManager.setSimOperatorNumericForPhone(
+                         mParentApp.getPhoneId(), operator);
+             } else {
+-                log("onAllRecordsLoaded empty 'gsm.sim.operator.numeric' skipping");
++                log("onAllEssentialRecordsLoaded empty 'gsm.sim.operator.numeric' skipping");
+             }
+ 
+             String imsi = getIMSI();
+ 
+             if (!TextUtils.isEmpty(imsi)) {
+-                log("onAllRecordsLoaded set mcc imsi=" + (VDBG ? ("=" + imsi) : ""));
++                log("onAllEssentialRecordsLoaded set mcc imsi=" + (VDBG ? ("=" + imsi) : ""));
+                 mTelephonyManager.setSimCountryIsoForPhone(mParentApp.getPhoneId(),
+                         MccTable.countryCodeForMcc(imsi.substring(0, 3)));
+             } else {
+-                log("onAllRecordsLoaded empty imsi skipping setting mcc");
++                log("onAllEssentialRecordsLoaded empty imsi skipping setting mcc");
+             }
+         }
+ 
++        mEssentialRecordsListenerNotified = true;
++        mEssentialRecordsLoadedRegistrants.notifyRegistrants(new AsyncResult(null, null, null));
++    }
++
++    @Override
++    protected void onAllRecordsLoaded() {
++        if (DBG) log("record load complete");
++
+         Resources resource = Resources.getSystem();
+         if (resource.getBoolean(com.android.internal.R.bool.config_use_sim_language_file)) {
+             setSimLanguage(mEFli, mEFpl);
+@@ -881,21 +897,37 @@ public class RuimRecords extends IccRecords {
+         mRecordsToLoad++;
+     }
+ 
+-    @UnsupportedAppUsage
+-    private void fetchRuimRecords() {
+-        mRecordsRequested = true;
+-
+-        if (DBG) log("fetchRuimRecords " + mRecordsToLoad);
++    private void fetchEssentialRuimRecords() {
++        if (DBG) log("fetchEssentialRuimRecords " + mRecordsToLoad);
+ 
+         if (!TextUtils.isEmpty(mParentApp.getAid())
+                 || mParentApp.getUiccProfile().getNumApplications() <= 1) {
+             mCi.getIMSIForApp(mParentApp.getAid(), obtainMessage(EVENT_GET_IMSI_DONE));
+             mRecordsToLoad++;
++            mEssentialRecordsToLoad++;
+         }
+ 
+         mFh.loadEFTransparent(EF_ICCID,
+                 obtainMessage(EVENT_GET_ICCID_DONE));
+         mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
++
++        mFh.loadEFTransparent(EF_CSIM_IMSIM,
++                obtainMessage(EVENT_GET_ICC_RECORD_DONE, new EfCsimImsimLoaded()));
++        mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
++
++        if (DBG) log("fetchEssentialRuimRecords " + mRecordsToLoad +
++                " requested: " + mRecordsRequested);
++    }
++
++    @UnsupportedAppUsage
++    private void fetchRuimRecords() {
++        mRecordsRequested = true;
++
++        fetchEssentialRuimRecords();
++
++        if (DBG) log("fetchRuimRecords " + mRecordsToLoad);
+ 
+         mFh.loadEFTransparent(EF_PL,
+                 obtainMessage(EVENT_GET_ICC_RECORD_DONE, new EfPlLoaded()));
+@@ -913,10 +945,6 @@ public class RuimRecords extends IccRecords {
+                 obtainMessage(EVENT_GET_ICC_RECORD_DONE, new EfCsimMdnLoaded()));
+         mRecordsToLoad++;
+ 
+-        mFh.loadEFTransparent(EF_CSIM_IMSIM,
+-                obtainMessage(EVENT_GET_ICC_RECORD_DONE, new EfCsimImsimLoaded()));
+-        mRecordsToLoad++;
+-
+         mFh.loadEFLinearFixedAll(EF_CSIM_CDMAHOME,
+                 obtainMessage(EVENT_GET_ICC_RECORD_DONE, new EfCsimCdmaHomeLoaded()));
+         mRecordsToLoad++;
+diff --git a/src/java/com/android/internal/telephony/uicc/SIMRecords.java b/src/java/com/android/internal/telephony/uicc/SIMRecords.java
+index 4f5f37068..a15770955 100755
+--- a/src/java/com/android/internal/telephony/uicc/SIMRecords.java
++++ b/src/java/com/android/internal/telephony/uicc/SIMRecords.java
+@@ -639,6 +639,7 @@ public class SIMRecords extends IccRecords {
+                 /* IO events */
+                 case EVENT_GET_IMSI_DONE:
+                     isRecordLoadResponse = true;
++                    mEssentialRecordsToLoad -= 1;
+                     ar = (AsyncResult) msg.obj;
+ 
+                     if (ar.exception != null) {
+@@ -745,6 +746,7 @@ public class SIMRecords extends IccRecords {
+ 
+                 case EVENT_GET_MSISDN_DONE:
+                     isRecordLoadResponse = true;
++                    mEssentialRecordsToLoad -= 1;
+ 
+                     ar = (AsyncResult) msg.obj;
+ 
+@@ -819,6 +821,7 @@ public class SIMRecords extends IccRecords {
+ 
+                 case EVENT_GET_ICCID_DONE:
+                     isRecordLoadResponse = true;
++                    mEssentialRecordsToLoad -= 1;
+ 
+                     ar = (AsyncResult) msg.obj;
+                     data = (byte[]) ar.result;
+@@ -1111,6 +1114,7 @@ public class SIMRecords extends IccRecords {
+ 
+                 case EVENT_GET_GID1_DONE:
+                     isRecordLoadResponse = true;
++                    mEssentialRecordsToLoad -= 1;
+ 
+                     ar = (AsyncResult) msg.obj;
+                     data = (byte[]) ar.result;
+@@ -1129,6 +1133,7 @@ public class SIMRecords extends IccRecords {
+ 
+                 case EVENT_GET_GID2_DONE:
+                     isRecordLoadResponse = true;
++                    mEssentialRecordsToLoad -= 1;
+                     ar = (AsyncResult) msg.obj;
+                     data = (byte[]) ar.result;
+ 
+@@ -1380,13 +1385,18 @@ public class SIMRecords extends IccRecords {
+         mRecordsToLoad -= 1;
+         if (DBG) log("onRecordLoaded " + mRecordsToLoad + " requested: " + mRecordsRequested);
+ 
++        if (getEssentialRecordsLoaded() && !mEssentialRecordsListenerNotified) {
++            onAllEssentialRecordsLoaded();
++        }
++
+         if (getRecordsLoaded()) {
+             onAllRecordsLoaded();
+         } else if (getLockedRecordsLoaded() || getNetworkLockedRecordsLoaded()) {
+             onLockedAllRecordsLoaded();
+-        } else if (mRecordsToLoad < 0) {
++        }else if (mRecordsToLoad < 0 || mEssentialRecordsToLoad < 0) {
+             loge("recordsToLoad <0, programmer error suspected");
+             mRecordsToLoad = 0;
++            mEssentialRecordsToLoad = 0;
+         }
+     }
+ 
+@@ -1430,35 +1440,41 @@ public class SIMRecords extends IccRecords {
+     }
+ 
+     @Override
+-    protected void onAllRecordsLoaded() {
+-        if (DBG) log("record load complete");
+-
+-        setSimLanguageFromEF();
+-        setVoiceCallForwardingFlagFromSimRecords();
+-
+-        // Some fields require more than one SIM record to set
++    protected void onAllEssentialRecordsLoaded() {
++        if (DBG) log("Essential record load complete");
+ 
+         String operator = getOperatorNumeric();
+         if (!TextUtils.isEmpty(operator)) {
+-            log("onAllRecordsLoaded set 'gsm.sim.operator.numeric' to operator='" +
++            log("onAllEssentialRecordsLoaded set 'gsm.sim.operator.numeric' to operator='" +
+                     operator + "'");
+             mTelephonyManager.setSimOperatorNumericForPhone(
+                     mParentApp.getPhoneId(), operator);
+         } else {
+-            log("onAllRecordsLoaded empty 'gsm.sim.operator.numeric' skipping");
++            log("onAllEssentialRecordsLoaded empty 'gsm.sim.operator.numeric' skipping");
+         }
+ 
+         String imsi = getIMSI();
+ 
+         if (!TextUtils.isEmpty(imsi) && imsi.length() >= 3) {
+-            log("onAllRecordsLoaded set mcc imsi" + (VDBG ? ("=" + imsi) : ""));
++            log("onEssentialAllRecordsLoaded set mcc imsi" + (VDBG ? ("=" + imsi) : ""));
+             mTelephonyManager.setSimCountryIsoForPhone(
+                     mParentApp.getPhoneId(), MccTable.countryCodeForMcc(imsi.substring(0, 3)));
+         } else {
+-            log("onAllRecordsLoaded empty imsi skipping setting mcc");
++            log("onEssentialAllRecordsLoaded empty imsi skipping setting mcc");
+         }
+ 
+         setVoiceMailByCountry(operator);
++        mEssentialRecordsListenerNotified = true;
++        mEssentialRecordsLoadedRegistrants.notifyRegistrants(new AsyncResult(null, null, null));
++    }
++
++    @Override
++    protected void onAllRecordsLoaded() {
++        if (DBG) log("record load complete");
++
++        setSimLanguageFromEF();
++        setVoiceCallForwardingFlagFromSimRecords();
++
+         mLoaded.set(true);
+         mRecordsLoadedRegistrants.notifyRegistrants(new AsyncResult(null, null, null));
+     }
+@@ -1519,23 +1535,43 @@ public class SIMRecords extends IccRecords {
+         mRecordsToLoad++;
+     }
+ 
+-    @UnsupportedAppUsage
+-    protected void fetchSimRecords() {
+-        mRecordsRequested = true;
+-
+-        if (DBG) log("fetchSimRecords " + mRecordsToLoad);
++    private void fetchEssentialSimRecords() {
++        if (DBG) log("fetchEssentialSimRecords " + mRecordsToLoad);
+ 
+         mCi.getIMSIForApp(mParentApp.getAid(), obtainMessage(EVENT_GET_IMSI_DONE));
+         mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
+ 
+         mFh.loadEFTransparent(EF_ICCID, obtainMessage(EVENT_GET_ICCID_DONE));
+         mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
+ 
+         // FIXME should examine EF[MSISDN]'s capability configuration
+         // to determine which is the voice/data/fax line
+         new AdnRecordLoader(mFh).loadFromEF(EF_MSISDN, getExtFromEf(EF_MSISDN), 1,
+                     obtainMessage(EVENT_GET_MSISDN_DONE));
+         mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
++
++        mFh.loadEFTransparent(EF_GID1, obtainMessage(EVENT_GET_GID1_DONE));
++        mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
++
++        mFh.loadEFTransparent(EF_GID2, obtainMessage(EVENT_GET_GID2_DONE));
++        mRecordsToLoad++;
++        mEssentialRecordsToLoad++;
++
++        if (DBG) log("fetchEssentialSimRecords " + mRecordsToLoad +
++                " requested: " + mRecordsRequested);
++    }
++
++    @UnsupportedAppUsage
++    protected void fetchSimRecords() {
++        mRecordsRequested = true;
++
++        fetchEssentialSimRecords();
++
++        if (DBG) log("fetchSimRecords " + mRecordsToLoad);
+ 
+         // Record number is subscriber profile
+         mFh.loadEFLinearFixed(EF_MBI, 1, obtainMessage(EVENT_GET_MBI_DONE));
+@@ -1579,11 +1615,6 @@ public class SIMRecords extends IccRecords {
+         mFh.loadEFTransparent(EF_CSP_CPHS,obtainMessage(EVENT_GET_CSP_CPHS_DONE));
+         mRecordsToLoad++;
+ 
+-        mFh.loadEFTransparent(EF_GID1, obtainMessage(EVENT_GET_GID1_DONE));
+-        mRecordsToLoad++;
+-
+-        mFh.loadEFTransparent(EF_GID2, obtainMessage(EVENT_GET_GID2_DONE));
+-        mRecordsToLoad++;
+ 
+         mFh.loadEFTransparent(EF_PLMN_W_ACT, obtainMessage(EVENT_GET_PLMN_W_ACT_DONE));
+         mRecordsToLoad++;
+-- 
+2.25.1
+

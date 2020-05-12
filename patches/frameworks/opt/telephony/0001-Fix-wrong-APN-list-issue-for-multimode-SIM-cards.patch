@@ -1,0 +1,135 @@
+From f6c0f78267aebdf5aa5bc9d87c2702fb83e1fc53 Mon Sep 17 00:00:00 2001
+From: Sneh Bansal <snehb@codeaurora.org>
+Date: Mon, 5 Feb 2018 12:14:06 +0530
+Subject: [PATCH 1/3] Fix wrong APN list issue for multimode SIM cards.
+
+For multimode cards with CSIM, USIM apps, if RUIMRecords are loaded
+first, then APNs will be read with operator numeric from RUIMRecords,
+leading to data call issues with wrong APNs.
+
+Add fix to wait for SIMRecords loaded event to create APN list.
+
+Change-Id: Ibb90188dfbb8270844703a7a271e260bae171755
+CRs-Fixed: 2178427
+---
+ .../internal/telephony/GsmCdmaPhone.java      |  5 +++
+ .../com/android/internal/telephony/Phone.java |  5 +++
+ .../telephony/dataconnection/DcTracker.java   | 34 +++++++++++++++----
+ 3 files changed, 38 insertions(+), 6 deletions(-)
+
+diff --git a/src/java/com/android/internal/telephony/GsmCdmaPhone.java b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
+index 073c36b4d..055d896c1 100644
+--- a/src/java/com/android/internal/telephony/GsmCdmaPhone.java
++++ b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
+@@ -2899,6 +2899,11 @@ public class GsmCdmaPhone extends Phone {
+         }
+     }
+ 
++    @Override
++    public SIMRecords getSIMRecords() {
++        return mSimRecords;
++    }
++
+     private void processIccRecordEvents(int eventCode) {
+         switch (eventCode) {
+             case IccRecords.EVENT_CFI:
+diff --git a/src/java/com/android/internal/telephony/Phone.java b/src/java/com/android/internal/telephony/Phone.java
+index 60e31286a..bbfec3461 100644
+--- a/src/java/com/android/internal/telephony/Phone.java
++++ b/src/java/com/android/internal/telephony/Phone.java
+@@ -82,6 +82,7 @@ import com.android.internal.telephony.uicc.IccCardApplicationStatus.AppType;
+ import com.android.internal.telephony.uicc.IccFileHandler;
+ import com.android.internal.telephony.uicc.IccRecords;
+ import com.android.internal.telephony.uicc.IsimRecords;
++import com.android.internal.telephony.uicc.SIMRecords;
+ import com.android.internal.telephony.uicc.UiccCard;
+ import com.android.internal.telephony.uicc.UiccCardApplication;
+ import com.android.internal.telephony.uicc.UiccController;
+@@ -4071,6 +4072,10 @@ public abstract class Phone extends Handler implements PhoneInternalInterface {
+         return RIL.RADIO_HAL_VERSION_UNKNOWN;
+     }
+ 
++    public SIMRecords getSIMRecords() {
++        return null;
++    }
++
+     public void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
+         pw.println("Phone: subId=" + getSubId());
+         pw.println(" mPhoneId=" + mPhoneId);
+diff --git a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
+index 75c86b7e9..4adee1a77 100644
+--- a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
++++ b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
+@@ -107,6 +107,8 @@ import com.android.internal.telephony.dataconnection.DataConnectionReasons.DataD
+ import com.android.internal.telephony.dataconnection.DataEnabledSettings.DataEnabledChangedReason;
+ import com.android.internal.telephony.metrics.TelephonyMetrics;
+ import com.android.internal.telephony.uicc.IccRecords;
++import com.android.internal.telephony.uicc.RuimRecords;
++import com.android.internal.telephony.uicc.SIMRecords;
+ import com.android.internal.telephony.uicc.UiccController;
+ import com.android.internal.util.ArrayUtils;
+ import com.android.internal.util.AsyncChannel;
+@@ -227,6 +229,7 @@ public class DcTracker extends Handler {
+     private final TelephonyManager mTelephonyManager;
+ 
+     private final AlarmManager mAlarmManager;
++    private SIMRecords mSimRecords;
+ 
+     /* Currently requested APN type (TODO: This should probably be a parameter not a member) */
+     private int mRequestedApnType = ApnSetting.TYPE_DEFAULT;
+@@ -245,6 +248,8 @@ public class DcTracker extends Handler {
+     // Default sent packets without ack which triggers initial recovery steps
+     private static final int NUMBER_SENT_PACKETS_OF_HANG = 10;
+ 
++    private static final int EVENT_SIM_RECORDS_LOADED = 100;
++
+     // Default for the data stall alarm while non-aggressive stall detection
+     private static final int DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 6;
+     // Default for the data stall alarm for aggressive stall detection
+@@ -3461,6 +3466,17 @@ public class DcTracker extends Handler {
+         return null;
+     }
+ 
++    void onRecordsLoaded() {
++        // If onRecordsLoadedOrSubIdChanged() is not called here, it should be called on
++        // onSubscriptionsChanged() when a valid subId is available.
++        int subId = mPhone.getSubId();
++        if (mSubscriptionManager.isActiveSubId(subId)) {
++            onRecordsLoadedOrSubIdChanged();
++        } else {
++            log("Ignoring EVENT_RECORDS_LOADED as subId is not valid: " + subId);
++        }
++    }
++
+     @Override
+     public void handleMessage (Message msg) {
+         if (VDBG) log("handleMessage msg=" + msg);
+@@ -3472,13 +3488,19 @@ public class DcTracker extends Handler {
+         int requestType;
+         switch (msg.what) {
+             case DctConstants.EVENT_RECORDS_LOADED:
+-                // If onRecordsLoadedOrSubIdChanged() is not called here, it should be called on
+-                // onSubscriptionsChanged() when a valid subId is available.
+-                int subId = mPhone.getSubId();
+-                if (mSubscriptionManager.isActiveSubId(subId)) {
+-                    onRecordsLoadedOrSubIdChanged();
++                mSimRecords = mPhone.getSIMRecords();
++                if ((mIccRecords.get() instanceof RuimRecords) && (mSimRecords != null)) {
++                    mSimRecords.registerForRecordsLoaded(this, EVENT_SIM_RECORDS_LOADED, null);
+                 } else {
+-                    log("Ignoring EVENT_RECORDS_LOADED as subId is not valid: " + subId);
++                    onRecordsLoaded();
++                }
++                break;
++
++            case EVENT_SIM_RECORDS_LOADED:
++                onRecordsLoaded();
++                if (mSimRecords != null) {
++                    mSimRecords.unregisterForRecordsLoaded(this);
++                    mSimRecords = null;
+                 }
+                 break;
+ 
+-- 
+2.25.1
+
