@@ -100,6 +100,7 @@
         <device name="SND_DEVICE_IN_HANDSET_DMIC" acdb_id="10004"/>
         <device name="SND_DEVICE_IN_HEADSET_MIC" acdb_id="10008"/>
         <device name="SND_DEVICE_IN_HANDSET_DMIC_STEREO" acdb_id="10010"/>
+        <device name="SND_DEVICE_IN_VOICE_REC_HEADSET_MIC" acdb_id="307"/>
     </acdb_ids>
     <backend_names>
         <device name="SND_DEVICE_OUT_HEADPHONES" backend="headphones" interface="INT0_MI2S_RX"/>
