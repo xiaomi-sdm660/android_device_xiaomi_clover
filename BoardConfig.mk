@@ -98,6 +98,7 @@ TW_MAX_BRIGHTNESS := 4095
 TW_THEME := portrait_hdpi
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_USE_TOOLBOX := true
+TW_EXCLUDE_TWRPAPP := true
 
 # Debug
 TWRP_INCLUDE_LOGCAT := true
