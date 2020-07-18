@@ -1,28 +1,6 @@
 # Audio
 vendor/firmware/tas2557s_uCDSP_d9p.bin
 vendor/firmware/tas2557s_uCDSP.bin
-vendor/lib/libacdb-fts.so
-vendor/lib/libacdbmapper.so
-vendor/lib/libacdbloader.so
-vendor/lib/libacdbrtac.so
-vendor/lib/libadiertac.so
-vendor/lib/libadm.so
-vendor/lib/libaudcal.so
-vendor/lib/libaudioalsa.so
-vendor/lib/libaudioparsers.so
-vendor/lib/libdrc.so
-vendor/lib/libqtigef.so
-vendor/lib/libsurround_3mic_proc.so
-
-vendor/lib64/libacdb-fts.so
-vendor/lib64/libacdbmapper.so
-vendor/lib64/libacdbloader.so
-vendor/lib64/libacdbrtac.so
-vendor/lib64/libadiertac.so
-vendor/lib64/libaudcal.so
-vendor/lib64/libaudioalsa.so
-vendor/lib64/libaudioparsers.so
-vendor/lib64/libqtigef.so
 
 # Audio ACDB
 vendor/etc/acdbdata/MTP/MTP_Bluetooth_cal.acdb
@@ -404,10 +382,6 @@ vendor/lib/hw/keystore.sdm660.so
 vendor/lib/hw/android.hardware.keymaster@3.0-impl-qti.so
 vendor/lib64/hw/keystore.sdm660.so
 vendor/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so
-
-# Sensors - from jasmine-user-10-QKQ1.190910.002-V11.0.4.0.QDIMIXM
-vendor/lib/sensors.ssc.so|69970f125d076dac8711c1d1687f7faeb7a75bed
-vendor/lib64/sensors.ssc.so|0ec630386e5f51dfe77acd0fc7886f01dcfc2c86
 
 # Thermal (Configs)
 vendor/etc/thermal-engine-battery.conf

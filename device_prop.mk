@@ -21,27 +21,6 @@
 # definition file).
 #
 
-# ACDB
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.audio.calfile0=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Bluetooth_cal.acdb \
-    persist.audio.calfile1=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_General_cal.acdb \
-    persist.audio.calfile2=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Global_cal.acdb \
-    persist.audio.calfile3=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Handset_cal.acdb \
-    persist.audio.calfile4=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Hdmi_cal.acdb \
-    persist.audio.calfile5=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Headset_cal.acdb \
-    persist.audio.calfile6=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_Speaker_cal.acdb \
-    persist.audio.calfile7=/vendor/etc/acdbdata/QRD/sdm660-snd-card-skush/QRD_SKUSH_workspaceFile.qwsp \
-    persist.audio.calfile8=/vendor/etc/acdbdata/adsp_avs_config.acdb \
-    persist.audio.calfile0D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Bluetooth_cal.acdb \
-    persist.audio.calfile1D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_General_cal.acdb \
-    persist.audio.calfile2D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Global_cal.acdb \
-    persist.audio.calfile3D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Handset_cal.acdb \
-    persist.audio.calfile4D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Hdmi_cal.acdb \
-    persist.audio.calfile5D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Headset_cal.acdb \
-    persist.audio.calfile6D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_Speaker_cal.acdb \
-    persist.audio.calfile7D9P=/vendor/etc/acdbdata/QRD/sdm660-snd-card-d9p/QRD_D9P_workspaceFile.qwsp \
-    persist.audio.calfile8D9P=/vendor/etc/acdbdata/adsp_avs_config.acdb
-
 # Audio
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.audio.fluence.audiorec=true
