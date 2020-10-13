@@ -32,6 +32,9 @@ TARGET_TAP_TO_WAKE_NODE := "/proc/touchscreen/enable_dt2w"
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := true
 
+# Density
+TARGET_SCREEN_DENSITY := 320
+
 # Kernel
 TARGET_KERNEL_SOURCE := kernel/xiaomi/sdm660
 TARGET_KERNEL_CONFIG := clover_defconfig
