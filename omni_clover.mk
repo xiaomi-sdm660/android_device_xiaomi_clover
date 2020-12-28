@@ -28,6 +28,20 @@ PRODUCT_PROPERTY_OVERRIDES += \
     sys.usb.rndis.func.name=rndis_bam \
     sys.usb.rmnet.func.name=rmnet_bam
 
+# qcom standard decryption
+PRODUCT_PACKAGES += \
+    qcom_decrypt \
+    qcom_decrypt_fbe
+
+# tzdata
+PRODUCT_PACKAGES += \
+    tzdata_twrp
+
+# Blacklist
+PRODUCT_SYSTEM_PROPERTY_BLACKLIST += \
+    ro.bootimage.build.date.utc \
+    ro.build.date.utc
+
 ## Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := clover
 PRODUCT_NAME := omni_clover

@@ -4,5 +4,11 @@
     "repository": "android_vendor_qcom_opensource_commonsys",
     "target_path": "vendor/qcom/opensource/commonsys",
     "revision": "android-9.0"
+  },
+  {
+    "remote": "TeamWin",
+    "repository": "android_device_qcom_twrp-common",
+    "target_path": "device/qcom/twrp-common",
+    "revision": "android-9.0"
   }
 ]
