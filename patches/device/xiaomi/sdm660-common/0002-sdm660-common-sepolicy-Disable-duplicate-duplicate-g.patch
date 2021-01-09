@@ -1,0 +1,40 @@
+From fe8a4e3a382ec3dc0f7c1c91772530979699a0b6 Mon Sep 17 00:00:00 2001
+From: Soul Trace <S-trace@list.ru>
+Date: Sun, 10 Jan 2021 01:57:50 +0300
+Subject: [PATCH 2/2] sdm660-common: sepolicy: Disable duplicate duplicate
+ genfs entry for RTC
+
+It is already defined in LineageOS 17.1 tree.
+
+Fixes build failure:
+FAILED: out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows
+/bin/bash -c "(ASAN_OPTIONS=detect_leaks=0 out/host/linux-x86/bin/checkpolicy -M -c             30 -o out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows.tmp out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/policy.conf ) && (out/host/linux-x86/bin/sepolicy-analyze out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows.tmp neverallow -w -f out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/policy_2.conf ||      ( echo \"\" 1>&2;         echo \"sepolicy-analyze failed. This is most likely due to the use\" 1>&2;       echo \"of an expanded attribute in a neverallow assertion. Please fix\" 1>&2;           echo \"the policy.\" 1>&2;       exit 1 ) ) && (touch out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows.tmp ) && (mv out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows.tmp out/target/product/clover/obj/ETC/sepolicy_neverallows_intermediates/sepolicy_neverallows )"
+device/xiaomi/sdm660-common/sepolicy/vendor/genfs_contexts:31:ERROR 'duplicate entry for genfs entry (sysfs, /devices/soc/800f000.qcom,spmi/spmi-0/spmi0-00/800f000.qcom,spmi:qcom,pm660@0:qcom,pm660_rtc/rtc)' at token 'genfscon' on line 85621:
+genfscon proc /nvt_wake_gesture                                 u:object_r:proc_dt2w:s0
+checkpolicy:  error(s) encountered while parsing configuration
+[ 14% 12375/87350] build out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy
+FAILED: out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy
+/bin/bash -c "(ASAN_OPTIONS=detect_leaks=0 out/host/linux-x86/bin/checkpolicy -M -c             30 -o out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.tmp out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.recovery.conf ) && (out/host/linux-x86/bin/sepolicy-analyze out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.tmp permissive > out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.permissivedomains ) && (if [ \"userdebug\" = \"user\" -a -s out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.permissivedomains ]; then                 echo \"==========\" 1>&2;               echo \"ERROR: permissive domains not allowed in user builds\" 1>&2;              echo \"List of invalid domains:\" 1>&2;                 cat out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.permissivedomains 1>&2;           exit 1;                 fi ) && (mv out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy.tmp out/target/product/clover/obj/ETC/sepolicy.recovery_intermediates/sepolicy )"
+device/xiaomi/sdm660-common/sepolicy/vendor/genfs_contexts:31:ERROR 'duplicate entry for genfs entry (sysfs, /devices/soc/800f000.qcom,spmi/spmi-0/spmi0-00/800f000.qcom,spmi:qcom,pm660@0:qcom,pm660_rtc/rtc)' at token 'genfscon' on line 93371:
+genfscon proc /nvt_wake_gesture                                 u:object_r:proc_dt2w:s0
+checkpolicy:  error(s) encountered while parsing configuration
+---
+ sepolicy/vendor/genfs_contexts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sepolicy/vendor/genfs_contexts b/sepolicy/vendor/genfs_contexts
+index 2a8a0601..117e3415 100644
+--- a/sepolicy/vendor/genfs_contexts
++++ b/sepolicy/vendor/genfs_contexts
+@@ -24,7 +24,7 @@ genfscon sysfs /devices/soc/ca0c000.qcom,cci/ca0c000.qcom,cci:qcom,camera@3/vide
+ genfscon sysfs /camera_sensorid/sensorid                        u:object_r:sysfs_graphics:s0
+ 
+ # RTC
+-genfscon sysfs /devices/soc/800f000.qcom,spmi/spmi-0/spmi0-00/800f000.qcom,spmi:qcom,pm660@0:qcom,pm660_rtc/rtc     u:object_r:sysfs_rtc:s0
++# genfscon sysfs /devices/soc/800f000.qcom,spmi/spmi-0/spmi0-00/800f000.qcom,spmi:qcom,pm660@0:qcom,pm660_rtc/rtc     u:object_r:sysfs_rtc:s0
+ 
+ # Touchscreen
+ genfscon proc /nvt_wake_gesture                                 u:object_r:proc_dt2w:s0
+-- 
+2.25.1
+
