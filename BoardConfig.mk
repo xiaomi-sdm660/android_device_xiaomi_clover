@@ -104,6 +104,7 @@ TW_THEME := portrait_hdpi
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_USE_TOOLBOX := true
 TW_EXCLUDE_TWRPAPP := true
+TW_HAS_EDL_MODE := true
 
 # Debug
 TWRP_INCLUDE_LOGCAT := true
