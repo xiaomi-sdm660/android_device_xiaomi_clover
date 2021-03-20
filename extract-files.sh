@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# Copyright (C) 2017-2019 The LineageOS Project
+# Copyright (C) 2016 The CyanogenMod Project
+# Copyright (C) 2017-2020 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# SPDX-License-Identifier: Apache-2.0
 #
 
 # If we're being sourced by the common script that we called,
@@ -26,6 +28,7 @@ set -e
 # Required!
 export DEVICE=clover
 export DEVICE_COMMON=sdm660-common
+export DEVICE_SPECIFIED_COMMON_DEVICE="clover"
 export VENDOR=xiaomi
 
 export DEVICE_BRINGUP_YEAR=2018
