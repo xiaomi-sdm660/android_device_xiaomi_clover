@@ -395,3 +395,6 @@ vendor/etc/thermal-engine-performance.conf
 vendor/etc/thermal-engine-map.conf
 vendor/etc/thermal-engine-default.conf
 vendor/etc/thermal-engine.conf
+
+# Wifi - from jasmine
+vendor/bin/cnss-daemon
