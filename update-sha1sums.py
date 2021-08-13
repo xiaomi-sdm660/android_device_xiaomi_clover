@@ -104,10 +104,14 @@ def update():
             if filePath[0] == '-':
                 filePath = filePath[1:]
 
-            with open(os.path.join(vendorPath, filePath), 'rb') as f:
-                hash = sha1(f.read()).hexdigest()
+            try:
+                with open(os.path.join(vendorPath, filePath), 'rb') as f:
+                    hash = sha1(f.read()).hexdigest()
+                lines[index] = '%s|%s' % (line, hash)
 
-            lines[index] = '%s|%s' % (line, hash)
+            except FileNotFoundError:
+                print("File not found: %s" % filePath)
+
     lines.append('')
 
 
